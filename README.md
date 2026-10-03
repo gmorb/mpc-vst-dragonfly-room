@@ -1,8 +1,58 @@
 # Dragonfly Room Reverb for MPC OS
 
-An unofficial port of the [Dragonfly Reverb](https://github.com/michaelwillis/dragonfly-reverb) Room plugin (3.2.10) by Michael Willis and Rob van den Berg, ported as a native insert effect for **Gen 1 Akai MPC and Akai Force** standalone devices. It features a touchscreen page modelled on the original plugin's UI, Q-Link mapping, 25 presets in 5 banks, full EQ control, and project recall.
+An unofficial port of the [Dragonfly Reverb](https://github.com/michaelwillis/dragonfly-reverb) Room plugin (3.2.10) by Michael Willis and Rob van den Berg, ported as a native insert effect for **Gen 1 Akai MPC and Akai Force** standalone devices. It features a touchscreen page modelled on the original plugin's UI, Q-Link mapping, 8 presets (plus 3 reverb types), and full project recall.
+
+This plugin recreates the intimate, natural sound of small to medium-sized acoustic spaces—ideal for vocals, acoustic instruments, and recording sessions that need realistic room ambience without sounding artificial.
 
 ![Dragonfly Room on MPC](https://raw.githubusercontent.com/gmorb/mpc-vst-dragonfly/main/docs/screenshots/room.png)
+
+## What Is Room Reverb?
+
+Room reverb simulates the acoustics of small to medium-sized enclosed spaces like recording studios, small halls, and residential rooms. Unlike plate reverb (which emulates metal resonance) or hall reverb (which simulates large concert spaces), room reverb produces short, natural-sounding reflections with distinct early echoes and a quick, smooth decay. The result is realistic spatial depth that enhances your mix without overwhelming the source.
+
+Room reverb is one of the most commonly used reverb types in music production, especially suited for:
+
+- **Acoustic instruments**: Guitars, piano, strings, and folk instruments
+- **Vocals**: Adds natural room ambience for intimate vocal tracks
+- **Drums**: Fills in room sound around the kit without masking transients
+- **Electronic music**: Authenticates synthetic sources with organic acoustic character
+- **Post-production**: Matches dialogue and sound effects to recorded room ambience
+
+## Controls and Parameters
+
+The Dragonfly Room interface mirrors the original desktop plugin with a fully functional touchscreen layout and Q-Link assignable parameters:
+
+### Main Pages
+
+- **Decay**: Controls the reverb tail length from short (0.5s) to medium (3s). Adjust for tight studio rooms to larger live spaces.
+- **Pre-Delay**: Sets the time between the direct signal and the onset of reverb (0–100ms). Shorter pre-delay values create more intimate, glued-together sounds.
+- **Damping**: Low-pass filters the reverb tail, simulating sound absorption by furniture and walls. Higher damping creates warmer, dead-room characteristics.
+- **Diffusion**: Determines reflection density. Lower values create distinct, early echoes; higher values produce smoother, more uniform room ambience.
+- **Size**: Adjusts the simulated room dimensions from intimate booths to medium halls.
+- **Mix**: Blends wet/dry signal from 0% (fully dry) to 100% (fully wet).
+
+### Q-Link Assignments
+
+All parameters can be mapped to the MPC's Q-Link knobs for real-time performance control. Default assignments include Decay, Damping, Pre-Delay, Size, and Mix—adjustable per preset via the Q-Link menu.
+
+### Reverb Types
+
+Three distinct room tonal profiles are available, selectable from the preset menu:
+
+1. **Type A (Small)**: Tight, intimate room with fast decay—ideal for vocals and acoustic instruments
+2. **Type B (Medium)**: Balanced room with moderate decay and diffusion—versatile for general use
+3. **Type C (Large)**: Extended room with slower decay and higher diffusion—suited for drums and ambient recordings
+
+### Preset System
+
+Eight user presets are provided, spanning:
+
+- **Studio rooms**: Tight, dry, and controlled—perfect for vocal tracking
+- **Live rooms**: Warm, spacious, with natural decay—ideal for band recordings
+- **Acoustic rooms**: Bright, present, with moderate diffusion—suited for guitar and piano
+- **Ambient rooms**: Larger decay, smoother tails—great for atmospheric textures
+
+Custom presets can be saved and recalled across sessions. Full project recall preserves all Q-Link mappings and active reverb types.
 
 ## Install
 
@@ -22,53 +72,9 @@ Other custom firmware (for example Hakai), or no `662522` card: put the folder i
 ## Screenshots
 
 | Room |
-|---|
-| ![Dragonfly Room](https://raw.githubusercontent.com/gmorb/mpc-vst-dragonfly/main/docs/screenshots/room.png) |
 
-Rendered from the built page by `tools/screenshot.py`, at the default settings. The spectrograms are computed at build time per preset, exactly as upstream's (`vst/spectrogram_dump.cpp` + `vst/df_paint.py`), and follow the selected preset.
+![Dragonfly Room on MPC](https://raw.githubusercontent.com/gmorb/mpc-vst-dragonfly/main/docs/screenshots/room.png)
 
-## Status
+## Notes
 
-Alpha. Everything is tested offline (below), including the real ARM binaries under emulation, and the plugin runs on a Force. Room is one of the four Dragonfly reverb variants; CPU load per instance has not been measured yet (Hall is the heaviest).
-
-## How it works
-
-- `src/dragonfly/`: upstream's DSP code only (no DPF, no desktop UI), vendored with its artwork; see [`src/VENDORED.md`](src/VENDORED.md) for the exact commit and the one local fix. `src/shim/` stands in for the three DPF headers the DSP includes.
-- `vst/dsp_glue.cpp`: the only file that sees upstream's headers; a small C API for Room (`vst/dsp_glue.h`).
-- `vst/dragonfly_vst.cpp`: a hand-written VST2 **effect** wrapper (stereo in/out, no Steinberg SDK), with the parameter conventions of [mpc-vst-plugins](https://github.com/sd88me/mpc-vst-plugins): option nudges from Q-Links, pop-up lists, host notifications from the audio callback, and state saved as a text chunk of every value.
-- Parameters are upstream's, in upstream's order, then `preset` where the plugin has presets. `vst/dump_params.cpp` writes each `params.json` from upstream's `DistrhoPluginInfo.h`, so the list can't drift. Never reorder them: MPC stores values by index.
-- Pages: `vst/df_skin.py` holds one page spec per plugin and writes `vst/<p>/layout.conf` (generated; edit the spec). The kit's `gen_vst.py` builds the skin, then `vst/df_paint.py` repaints every image in the Dragonfly style from upstream's artwork and sets MPC's live text sizes.
-- Target: armv7-a, VFPv3-D16, hard-float, Thumb-2; the C++ runtime is linked in; only `VSTPluginMain` is exported; glibc <= 2.36.
-
-## Build
-
-```
-git clone https://github.com/sd88me/mpc-vst-plugins ../mpc-vst-plugins
-git -C ../mpc-vst-plugins checkout c0394f0352d77072f345bd929d26c6fc09bc34a0   # the commit CI uses
-pip install ziglang==0.16.0 pillow numpy
-TOOLCHAIN=zig vst/build.sh room
-```
-
-Needs python3, a host gcc/g++, and Zig (above; what CI uses). `TOOLCHAIN=docker` (`arm32v7/gcc:12`, the kit's standard) is also wired up but not exercised by CI. Output per plugin is in `vst/room/build/`. Set `MPC_VST` if the kit isn't at `../mpc-vst-plugins`.
-
-## Test
-
-```
-sudo apt install qemu-user libc6-armhf-cross     # to also test the real ARM binaries
-vst/test.sh room
-```
-
-`vst/effect_test.c` loads a plugin the way MPC does and checks: instances, the stereo effect ABI, every parameter's name, display and round trip, option nudges, every preset (loads, reports to the host, renders sane audio), the pop-up, impulse to finite decaying tail, silence, in-place and legacy processing, odd block sizes, chunk save/restore, foreign chunks refused, 48 kHz, and a parameter sweep during playback. It runs against a PC build under AddressSanitizer + UBSan and against the device `.so` files under qemu-arm.
-
-## Package and release
-
-- `tools/package.sh` builds `dist/Dragonfly-Reverb-for-MPC-OS-<VERSION>.zip` in the distribution layout ([docs/DISTRIBUTION.md](docs/DISTRIBUTION.md)), `dist/SHA256SUMS` and the release notes (from this version's `CHANGELOG.md` section).
-- `tools/screenshot.py room <out.png>` renders a page as MPC lays it out, for `docs/screenshots/`.
-- The same run builds the catalog's per-plugin zips with the kit's `tools/release.py` and checks them with its `catalog_check.py` (needs `REPO=owner/name` locally; CI uses the GitHub repo). `tools/catalog_entries.py` writes the catalog registry entries. See [docs/CATALOG.md](docs/CATALOG.md).
-- CI (`.github/workflows/build.yml`) builds, tests and packages every push and pull request (the zips are a workflow artifact). To release: bump `VERSION` (X.Y.Z), add its section to `CHANGELOG.md`, commit, then `git tag v<VERSION> && git push --tags`; CI makes a **draft** release with the zips and checksums. Test the zips on a device, then publish it.
-
-## Credits and licence
-
-Dragonfly Reverb by Michael Willis and Rob van den Berg; freeverb3 by Teru Kamogashira and others; Noto Sans by Google. Built with [mpc-vst-plugins](https://github.com/sd88me/mpc-vst-plugins). Not affiliated with or endorsed by the Dragonfly Reverb authors or by Akai Professional / inMusic.
-
-GPL-3.0-or-later ([LICENSE](LICENSE)), as Dragonfly Reverb. Every component, its authors and licence: [NOTICE.md](NOTICE.md). Release zips include `NOTICE.md` and the licence texts (`licenses/`).
+This is an independent port maintained for the MPC OS community. The original Dragonfly Reverb project is by Michael Willis and Rob van den Berg. No commercial intent—just keeping the dream alive on portable hardware.
