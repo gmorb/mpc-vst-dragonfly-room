@@ -1,10 +1,10 @@
+![Dragonfly Room on MPC](https://raw.githubusercontent.com/gmorb/mpc-vst-dragonfly/main/docs/screenshots/room.png)
+
 # Dragonfly Room Reverb for MPC OS
 
 An unofficial port of the [Dragonfly Reverb](https://github.com/michaelwillis/dragonfly-reverb) Room plugin (3.2.10) by Michael Willis and Rob van den Berg, ported as a native insert effect for **Gen 1 Akai MPC and Akai Force** standalone devices. It features a touchscreen page modelled on the original plugin's UI, Q-Link mapping, 8 presets (plus 3 reverb types), and full project recall.
 
 This plugin recreates the intimate, natural sound of small to medium-sized acoustic spaces—ideal for vocals, acoustic instruments, and recording sessions that need realistic room ambience without sounding artificial.
-
-![Dragonfly Room on MPC](https://raw.githubusercontent.com/gmorb/mpc-vst-dragonfly/main/docs/screenshots/room.png)
 
 ## What Is Room Reverb?
 
