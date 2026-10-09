@@ -1,4 +1,4 @@
-![Dragonfly Room on MPC](https://raw.githubusercontent.com/gmorb/mpc-vst-dragonfly/main/docs/screenshots/room.png)
+![Dragonfly Room on MPC](https://raw.githubusercontent.com/gmorb/mpc-vst-dragonfly-room/main/docs/banners/room.png)
 
 # Dragonfly Room Reverb for MPC OS
 
@@ -73,7 +73,7 @@ Other custom firmware (for example Hakai), or no `662522` card: put the folder i
 
 | Room |
 
-![Dragonfly Room on MPC](https://raw.githubusercontent.com/gmorb/mpc-vst-dragonfly/main/docs/screenshots/room.png)
+![Dragonfly Room on MPC](https://raw.githubusercontent.com/gmorb/mpc-vst-dragonfly-room/main/docs/banners/room.png)
 
 ## Notes
 
